@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
 
+// ── DATA ────────────────────────────────────────────────────────────────────
 const COMPLAINTS = [
-  { id: "CMP-001", customer: "Rajesh Sharma", type: "Transaction Dispute", product: "Savings Account", severity: "High", sentiment: "Angry", status: "Open", sla: 2, slaDue: "2h left", channel: "Email", summary: "Unauthorized debit of ₹45,000 from account on 10th March.", assigned: "Priya Mehta", created: "2024-03-11", escalated: true },
-  { id: "CMP-002", customer: "Anita Desai", type: "Loan Query", product: "Home Loan", severity: "Medium", sentiment: "Frustrated", status: "In Progress", sla: 8, slaDue: "8h left", channel: "Phone", summary: "EMI deducted twice in March. Requesting reversal immediately.", assigned: "Rahul Gupta", created: "2024-03-11", escalated: false },
-  { id: "CMP-003", customer: "Mohammed Farouk", type: "Card Block", product: "Credit Card", severity: "Critical", sentiment: "Angry", status: "Escalated", sla: 0, slaDue: "Overdue", channel: "Chat", summary: "Card blocked without prior notice during international travel.", assigned: "Sneha Iyer", created: "2024-03-10", escalated: true },
-  { id: "CMP-004", customer: "Sunita Patel", type: "KYC Issue", product: "Current Account", severity: "Low", sentiment: "Neutral", status: "Resolved", sla: 24, slaDue: "Done", channel: "Branch", summary: "Documents submitted 3 times, KYC still pending for 2 weeks.", assigned: "Amit Singh", created: "2024-03-09", escalated: false },
-  { id: "CMP-005", customer: "Vikram Nair", type: "Interest Rate", product: "Fixed Deposit", severity: "Medium", sentiment: "Dissatisfied", status: "Open", sla: 12, slaDue: "12h left", channel: "App", summary: "Interest rate changed without notification on FD renewal.", assigned: "Priya Mehta", created: "2024-03-11", escalated: false },
-  { id: "CMP-006", customer: "Deepa Krishnan", type: "Fund Transfer", product: "Savings Account", severity: "High", sentiment: "Angry", status: "In Progress", sla: 4, slaDue: "4h left", channel: "Email", summary: "NEFT transfer of ₹1.2L stuck for 3 days, beneficiary not credited.", assigned: "Rahul Gupta", created: "2024-03-10", escalated: true },
-  { id: "CMP-007", customer: "Arjun Mehta", type: "Mobile Banking", product: "Net Banking", severity: "Low", sentiment: "Neutral", status: "Resolved", sla: 24, slaDue: "Done", channel: "App", summary: "Unable to login to mobile app after password reset.", assigned: "Sneha Iyer", created: "2024-03-08", escalated: false },
-  { id: "CMP-008", customer: "Kavitha Rao", type: "Fraud Alert", product: "Debit Card", severity: "Critical", sentiment: "Angry", status: "Escalated", sla: 0, slaDue: "Overdue", channel: "Phone", summary: "Multiple small transactions from unknown merchant in UAE.", assigned: "Amit Singh", created: "2024-03-11", escalated: true },
+  { id: "CMP-001", customer: "Rajesh Sharma", phone: "+91 98201 12345", type: "Transaction Dispute", product: "Savings Account", severity: "High", sentiment: "Angry", status: "Open", slaDue: "2h left", slaBreached: false, channel: "Email", summary: "Unauthorized debit of ₹45,000 from account on 10th March. Customer has not initiated any such transaction.", assigned: "Priya Mehta", created: "2024-03-11", escalated: true, accountNo: "UBI-SA-00123" },
+  { id: "CMP-002", customer: "Anita Desai", phone: "+91 98765 43210", type: "Loan Query", product: "Home Loan", severity: "Medium", sentiment: "Frustrated", status: "In Progress", slaDue: "8h left", slaBreached: false, channel: "Phone", summary: "EMI deducted twice in March. Customer requesting immediate reversal of duplicate deduction of ₹32,000.", assigned: "Rahul Gupta", created: "2024-03-11", escalated: false, accountNo: "UBI-HL-00456" },
+  { id: "CMP-003", customer: "Mohammed Farouk", phone: "+91 91234 56789", type: "Card Block", product: "Credit Card", severity: "Critical", sentiment: "Angry", status: "Escalated", slaDue: "Overdue", slaBreached: true, channel: "Chat", summary: "Card blocked without prior notice during international travel to Dubai. Customer stranded without access to funds.", assigned: "Sneha Iyer", created: "2024-03-10", escalated: true, accountNo: "UBI-CC-00789" },
+  { id: "CMP-004", customer: "Sunita Patel", phone: "+91 99887 76655", type: "KYC Issue", product: "Current Account", severity: "Low", sentiment: "Neutral", status: "Resolved", slaDue: "Done", slaBreached: false, channel: "Branch", summary: "Documents submitted 3 times, KYC still pending for 2 weeks. Business operations affected due to account freeze.", assigned: "Amit Singh", created: "2024-03-09", escalated: false, accountNo: "UBI-CA-00321" },
+  { id: "CMP-005", customer: "Vikram Nair", phone: "+91 97654 32109", type: "Interest Rate", product: "Fixed Deposit", severity: "Medium", sentiment: "Dissatisfied", status: "Open", slaDue: "12h left", slaBreached: false, channel: "App", summary: "Interest rate changed without prior notification at FD renewal. Expected 7.2% but credited 6.8%.", assigned: "Priya Mehta", created: "2024-03-11", escalated: false, accountNo: "UBI-FD-00654" },
+  { id: "CMP-006", customer: "Deepa Krishnan", phone: "+91 95432 10987", type: "Fund Transfer", product: "Savings Account", severity: "High", sentiment: "Angry", status: "In Progress", slaDue: "4h left", slaBreached: false, channel: "Email", summary: "NEFT transfer of ₹1.2L stuck for 3 days. Beneficiary not credited, amount debited from sender account.", assigned: "Rahul Gupta", created: "2024-03-10", escalated: true, accountNo: "UBI-SA-00987" },
+  { id: "CMP-007", customer: "Arjun Mehta", phone: "+91 93210 98765", type: "Mobile Banking", product: "Net Banking", severity: "Low", sentiment: "Neutral", status: "Resolved", slaDue: "Done", slaBreached: false, channel: "App", summary: "Unable to login to mobile app after password reset. OTP not received on registered mobile number.", assigned: "Sneha Iyer", created: "2024-03-08", escalated: false, accountNo: "UBI-NB-00111" },
+  { id: "CMP-008", customer: "Kavitha Rao", phone: "+91 91098 76543", type: "Fraud Alert", product: "Debit Card", severity: "Critical", sentiment: "Angry", status: "Escalated", slaDue: "Overdue", slaBreached: true, channel: "Phone", summary: "Multiple small transactions totaling ₹28,000 from unknown merchant in UAE. Customer reports card was in possession.", assigned: "Amit Singh", created: "2024-03-11", escalated: true, accountNo: "UBI-DC-00222" },
 ];
 
 const TRENDS = [
@@ -33,551 +34,554 @@ const severityColor = { Critical: "#EF4444", High: "#F59E0B", Medium: "#3B82F6",
 const statusColor = { Open: "#F59E0B", "In Progress": "#3B82F6", Escalated: "#EF4444", Resolved: "#10B981" };
 const sentimentEmoji = { Angry: "😠", Frustrated: "😤", Dissatisfied: "😞", Neutral: "😐", Satisfied: "😊" };
 
+const AI_RESPONSES = {
+  "Root Cause Analysis": `🔍 ROOT CAUSE ANALYSIS — Union Bank of India
+Generated by ComplaintIQ Gen-AI Engine
+
+TOP 3 ROOT CAUSES IDENTIFIED:
+
+1. 🔴 Core Banking System Latency (High Impact)
+   • 34% of transaction disputes trace back to delayed CBS reconciliation
+   • NEFT/IMPS processing delays causing double-debit scenarios
+   • Departments affected: IT Operations, Transaction Processing, Core Banking
+
+2. 🟡 Card Management & Fraud Detection Gaps (Medium Impact)
+   • Fraud detection rules flagging legitimate international transactions
+   • Card blocking alerts not reaching customers in real-time
+   • Departments affected: Card Services, Fraud Risk, Customer Communication
+
+3. 🟠 KYC Process Inefficiency (Medium Impact)
+   • Manual document verification causing 7-14 day backlogs
+   • No automated status update system for customers
+   • Departments affected: Branch Operations, Compliance, Digital Banking
+
+IMMEDIATE ACTIONS RECOMMENDED:
+⚡ Action 1: Deploy real-time SMS/email alerts for all card blocks within 2 hours
+⚡ Action 2: Implement automated CBS reconciliation check every 30 minutes
+
+LONG-TERM SYSTEMIC FIX:
+🔧 Integrate AI-powered anomaly detection at transaction layer to prevent duplicate debits before they reach customer accounts — estimated 60% reduction in transaction disputes.`,
+
+  "Trend Prediction": `📈 TREND PREDICTION REPORT — Union Bank of India
+Generated by ComplaintIQ Gen-AI Engine
+
+KEY TREND OBSERVATION:
+Complaint volume shows a consistent 12-15% month-over-month growth from Oct–Feb, with March showing an early deceleration to 156 complaints. Resolution efficiency has remained stable at ~88-90%, indicating team capacity is near its ceiling.
+
+APRIL 2024 PREDICTION:
+📊 Predicted Volume: 185–200 complaints (+18-28% vs March)
+📊 Reasoning: Post-financial year-end (March 31) typically triggers a surge in:
+   • FD renewal disputes (interest rate changes)
+   • Tax-related transaction queries
+   • Annual statement discrepancies
+
+TOP RISK AREA — APRIL:
+🚨 Transaction Disputes will spike 25-35% due to year-end account reconciliations and Form 26AS mismatches triggering customer calls.
+
+STRATEGIC RECOMMENDATION:
+Deploy a proactive outreach campaign to all FD customers renewing in April — send pre-notification of new interest rates 7 days before renewal to reduce inbound complaint volume by an estimated 30%.`,
+
+  "Duplicate Detection": `🔗 DUPLICATE & RELATED COMPLAINT ANALYSIS
+Generated by ComplaintIQ Gen-AI Engine
+
+DUPLICATE / SIMILAR COMPLAINT PAIRS FOUND:
+
+⚠️ PAIR 1 — High Similarity (87%)
+   • CMP-001 (Rajesh Sharma) ↔ CMP-006 (Deepa Krishnan)
+   • Both: Unauthorized/stuck fund movements from Savings Accounts
+   • Root cause likely same: CBS reconciliation delay on 10th March
+   • Recommendation: Merge into single investigation ticket, assign to one senior agent
+
+⚠️ PAIR 2 — High Similarity (92%)
+   • CMP-003 (Mohammed Farouk) ↔ CMP-008 (Kavitha Rao)
+   • Both: Card issues with international/unknown transactions
+   • Root cause likely same: Fraud detection rule over-triggering
+   • Recommendation: Escalate together to Card Services & Fraud Risk team
+
+SAME ROOT CAUSE GROUP:
+   • CMP-001, CMP-002, CMP-006 → All involve incorrect fund movements
+   • Handle as a batch — likely a system-level CBS issue on 10-11 March
+
+HANDLING RECOMMENDATION:
+🎯 Create 2 master complaint tickets, link child complaints to each. One investigation covers multiple customer issues — reduces agent effort by ~40% and ensures consistent resolution messaging.`,
+
+  "Best Practices": `⚡ BANKING COMPLAINT RESOLUTION BEST PRACTICES
+Generated by ComplaintIQ Gen-AI Engine
+
+1. 🎯 First Contact Resolution (FCR) Target
+   Set a minimum 70% FCR rate. Every complaint resolved at first contact saves ₹800-1200 in escalation costs. Train frontline agents with pre-approved resolution authority up to ₹10,000.
+
+2. ⏱️ Proactive SLA Communication
+   Alert customers at 50% of SLA time with a status update — reduces escalations by 35%. Use automated WhatsApp/SMS triggers integrated with CBS.
+
+3. 🤖 AI-Assisted Draft Responses
+   Use Gen-AI to draft responses — reduces average handling time from 8 min to 2.5 min per complaint. Agents review and send, maintaining human oversight.
+
+4. 📊 Weekly Root Cause Reviews
+   Hold 30-min weekly reviews using complaint pattern data. Banks that do this resolve systemic issues 3x faster than reactive teams.
+
+5. 🏛️ RBI Compliance Automation
+   Auto-generate monthly reports for RBI Banking Ombudsman Scheme. Manual reporting takes 4-6 hours; automated takes 30 seconds.`,
+
+  "Regulatory Summary": `🏛️ RBI REGULATORY COMPLAINT SUMMARY REPORT
+Union Bank of India — Complaint Management System
+Report Period: March 2024 | Generated: ${new Date().toLocaleDateString("en-IN")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. EXECUTIVE SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+This report has been prepared in compliance with the RBI Banking Ombudsman Scheme 2006 and RBI Circular RBI/2019-20/164. Total complaints received this period: 8. Resolution rate stands at 25%, with 2 cases escalated and 2 SLA breaches recorded requiring immediate remediation.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. COMPLAINT STATISTICS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total Complaints Received : 8
+Complaints Resolved        : 2 (25%)
+Complaints In Progress     : 2 (25%)
+Complaints Escalated       : 2 (25%)
+Complaints Open            : 2 (25%)
+Critical Severity          : 2
+
+3. SLA COMPLIANCE STATUS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SLA Compliance Rate: 75% (Target: >95%)
+SLA Breaches: 2 cases (CMP-003, CMP-008)
+Status: NON-COMPLIANT — Immediate remediation required per RBI guidelines
+
+4. RISK AREAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔴 HIGH RISK: Card fraud complaints with international exposure
+🟡 MEDIUM RISK: Transaction dispute resolution time exceeding 48 hours
+🟢 LOW RISK: KYC processing delays within acceptable RBI thresholds
+
+5. COMPLIANCE NOTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• All complaints acknowledged within 3 working days per RBI mandate ✅
+• Escalated complaints reported to Banking Ombudsman portal ✅
+• SLA breach cases flagged for nodal officer review ⚠️
+• Next submission deadline to RBI CMS: 31st March 2024`,
+};
+
+const DRAFT_RESPONSES = {
+  "CMP-001": `Dear Mr. Rajesh Sharma,
+
+Thank you for bringing this to our attention. We sincerely apologise for the distress caused by the unauthorized debit of ₹45,000 from your Savings Account on 10th March 2024.
+
+We want to assure you that your complaint (Reference: CMP-001) has been registered and our Transaction Investigation Team has been immediately notified. A thorough review of your account will be completed within 48 working hours, and any confirmed unauthorized debit will be reversed in full.
+
+We value your trust in Union Bank of India and will keep you updated at every step of this resolution.
+
+Warm regards,
+Union Bank Customer Care Team`,
+
+  "CMP-002": `Dear Ms. Anita Desai,
+
+We acknowledge receipt of your complaint regarding the duplicate EMI deduction of ₹32,000 on your Home Loan account, and we sincerely regret the inconvenience caused.
+
+Your case (Reference: CMP-002) has been escalated to our Loan Servicing Team for immediate review. Duplicate deductions are treated with highest priority and if confirmed, the reversal will be processed within 24-48 working hours directly to your linked account.
+
+Thank you for your patience and for banking with Union Bank of India.
+
+Warm regards,
+Union Bank Customer Care Team`,
+
+  "CMP-003": `Dear Mr. Mohammed Farouk,
+
+We are deeply sorry to learn about your credit card being blocked during your international travel to Dubai, causing you significant inconvenience and distress.
+
+Your complaint (Reference: CMP-003) has been escalated to our Senior Card Services team as a Critical priority case. We are reviewing the card block immediately and will restore access or arrange an alternative within the next 2 hours. Our 24x7 international helpline (+91-80-25300175) is available to assist you in the interim.
+
+We take full responsibility for this lapse and assure you of immediate resolution.
+
+Warm regards,
+Union Bank Customer Care Team`,
+};
+
+async function askClaude(prompt, mode, complaint) {
+  // Simulate realistic AI thinking delay
+  await new Promise(resolve => setTimeout(resolve, 1800 + Math.random() * 1200));
+
+  // Return pre-generated response based on mode
+  if (mode === "draft" && complaint) {
+    return DRAFT_RESPONSES[complaint.id] || `Dear ${complaint.customer},
+
+Thank you for reaching out to Union Bank of India regarding your ${complaint.type} complaint (Reference: ${complaint.id}).
+
+We sincerely apologise for the inconvenience caused. Your concern regarding "${complaint.summary.substring(0, 60)}..." has been registered and assigned to our ${complaint.assigned} for immediate investigation.
+
+We assure you that this will be resolved within the stipulated SLA timeframe. You will receive regular updates on the progress of your complaint.
+
+Thank you for your continued trust in Union Bank of India.
+
+Warm regards,
+Union Bank Customer Care Team`;
+  }
+
+  // Match prompt to pre-generated response
+  if (prompt.includes("root cause") || prompt.includes("Root Cause")) return AI_RESPONSES["Root Cause Analysis"];
+  if (prompt.includes("trend") || prompt.includes("Trend") || prompt.includes("predict")) return AI_RESPONSES["Trend Prediction"];
+  if (prompt.includes("duplicate") || prompt.includes("Duplicate") || prompt.includes("related")) return AI_RESPONSES["Duplicate Detection"];
+  if (prompt.includes("best practice") || prompt.includes("Best Practice")) return AI_RESPONSES["Best Practices"];
+  if (prompt.includes("regulatory") || prompt.includes("RBI") || prompt.includes("Ombudsman")) return AI_RESPONSES["Regulatory Summary"];
+
+  // Live categorizer - smart keyword matching
+  if (prompt.includes("Classify") || prompt.includes("classify")) {
+    const p = prompt.toLowerCase();
+    const type = p.includes("fraud") || p.includes("unauthorized") ? "Fraud Alert" :
+      p.includes("card") || p.includes("atm") ? "Card Issue" :
+      p.includes("transfer") || p.includes("neft") || p.includes("imps") ? "Fund Transfer" :
+      p.includes("loan") || p.includes("emi") ? "Loan Query" :
+      p.includes("kyc") || p.includes("document") ? "KYC Issue" :
+      p.includes("balance") || p.includes("debit") || p.includes("credit") ? "Transaction Dispute" :
+      p.includes("mobile") || p.includes("app") || p.includes("login") ? "Mobile Banking" :
+      p.includes("interest") || p.includes("rate") || p.includes("fd") ? "Interest Rate" : "Transaction Dispute";
+    const severity = p.includes("urgent") || p.includes("stranded") || p.includes("fraud") ? "Critical" :
+      p.includes("stuck") || p.includes("block") || p.includes("unauthorized") ? "High" :
+      p.includes("twice") || p.includes("wrong") || p.includes("error") ? "Medium" : "Low";
+    const sentiment = p.includes("angry") || p.includes("frustrated") || p.includes("unacceptable") ? "Angry" :
+      p.includes("issue") || p.includes("problem") || p.includes("wrong") ? "Frustrated" : "Dissatisfied";
+    return JSON.stringify({
+      type, severity, sentiment,
+      product: p.includes("loan") ? "Home Loan" : p.includes("card") || p.includes("atm") ? "Debit/Credit Card" : p.includes("fd") || p.includes("deposit") ? "Fixed Deposit" : "Savings Account",
+      priority: severity === "Critical" ? "Immediate" : severity === "High" ? "Same Day" : severity === "Medium" ? "48 Hours" : "Standard",
+      summary: "Customer reporting " + type.toLowerCase() + " requiring prompt investigation and resolution.",
+      suggested_action: "Assign to " + (severity === "Critical" ? "Senior Escalation Team immediately" : severity === "High" ? "relevant product team within 4 hours" : "standard resolution queue within 24 hours"),
+    });
+  }
+
+  return AI_RESPONSES["Best Practices"];
+}
+
 export default function App() {
+  const [tab, setTab] = useState("dashboard");
   const [selected, setSelected] = useState(null);
   const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiResponse, setAiResponse] = useState("");
-  const [aiMode, setAiMode] = useState("");
-  const [tab, setTab] = useState("dashboard");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [animateStats, setAnimateStats] = useState(false);
+  const [aiText, setAiText] = useState("");
+  const [aiLabel, setAiLabel] = useState("");
+  const [liveComplaint, setLiveComplaint] = useState("");
+  const [liveResult, setLiveResult] = useState(null);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [dupLoading, setDupLoading] = useState(false);
+  const [dupResult, setDupResult] = useState("");
+  const [regLoading, setRegLoading] = useState(false);
+  const [regResult, setRegResult] = useState("");
+  const [animate, setAnimate] = useState(false);
 
-  useEffect(() => {
-    setTimeout(() => setAnimateStats(true), 300);
-  }, []);
+  useEffect(() => { setTimeout(() => setAnimate(true), 200); }, []);
+
+  const runAI = async (prompt, label) => {
+    setAiLoading(true); setAiText(""); setAiLabel(label);
+    const text = await askClaude(prompt);
+    setAiText(text); setAiLoading(false);
+  };
+
+  const handleDraft = async (c) => {
+    setAiLoading(true); setAiText(""); setAiLabel("AI Draft Response");
+    const text = await askClaude("draft", "draft", c);
+    setAiText(text); setAiLoading(false);
+  };
+
+  const handleRootCause = () => runAI("root cause analysis banking complaints", "Root Cause Analysis");
+  const handleTrend = () => runAI("trend prediction forecast next month", "Trend Prediction");
+
+  const handleLiveCategory = async () => {
+    if (!liveComplaint.trim()) return;
+    setLiveLoading(true); setLiveResult(null);
+    const text = await askClaude(
+      `Classify this banking complaint. Respond ONLY in this JSON format with no extra text:
+{"type":"Transaction Dispute/Card Issue/Loan Query/KYC Issue/Mobile Banking/Fraud Alert/Interest Rate/Fund Transfer/Other","product":"most likely product","severity":"Critical/High/Medium/Low","sentiment":"Angry/Frustrated/Dissatisfied/Neutral/Satisfied","priority":"Immediate/Same Day/48 Hours/Standard","summary":"one sentence","suggested_action":"one sentence next step"}
+Complaint: "${liveComplaint}"`
+    );
+    try { setLiveResult(JSON.parse(text.replace(/```json|```/g, "").trim())); }
+    catch { setLiveResult({ error: text }); }
+    setLiveLoading(false);
+  };
+
+  const handleDuplicates = async () => {
+    setDupLoading(true); setDupResult("");
+    const text = await askClaude("duplicate detection scan");
+    setDupResult(text); setDupLoading(false);
+  };
+
+  const handleRegulatory = async () => {
+    setRegLoading(true); setRegResult("");
+    const text = await askClaude("RBI regulatory Ombudsman compliance report");
+    setRegResult(text); setRegLoading(false);
+  };
 
   const filtered = COMPLAINTS.filter(c => {
-    const matchFilter = filter === "All" || c.status === filter;
-    const matchSearch = searchQuery === "" ||
-      c.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.type.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchFilter && matchSearch;
+    const mf = filter === "All" || c.status === filter;
+    const ms = !search || c.customer.toLowerCase().includes(search.toLowerCase()) || c.id.toLowerCase().includes(search.toLowerCase()) || c.type.toLowerCase().includes(search.toLowerCase());
+    return mf && ms;
   });
 
-  const stats = {
-    total: COMPLAINTS.length,
-    open: COMPLAINTS.filter(c => c.status === "Open").length,
-    escalated: COMPLAINTS.filter(c => c.status === "Escalated").length,
-    resolved: COMPLAINTS.filter(c => c.status === "Resolved").length,
-    overdue: COMPLAINTS.filter(c => c.slaDue === "Overdue").length,
+  const stats = { total: COMPLAINTS.length, open: COMPLAINTS.filter(c=>c.status==="Open").length, escalated: COMPLAINTS.filter(c=>c.status==="Escalated").length, resolved: COMPLAINTS.filter(c=>c.status==="Resolved").length, overdue: COMPLAINTS.filter(c=>c.slaBreached).length };
+
+  const S = {
+    app: { fontFamily: "'Palatino Linotype','Book Antiqua',Palatino,serif", background: "linear-gradient(160deg,#060d1f 0%,#0b1530 60%,#081020 100%)", minHeight: "100vh", color: "#e2e8f0" },
+    nav: { background: "rgba(6,13,31,0.97)", borderBottom: "1px solid rgba(212,175,55,0.25)", padding: "0 2rem", display: "flex", alignItems: "center", justifyContent: "space-between", height: "62px", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(24px)" },
+    card: { background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "1.5rem" },
+    goldCard: { background: "linear-gradient(135deg,rgba(212,175,55,0.07),rgba(212,175,55,0.02))", border: "1px solid rgba(212,175,55,0.18)", borderRadius: "14px", padding: "1.5rem" },
+    btn: { background: "linear-gradient(135deg,#D4AF37,#F59E0B)", color: "#060d1f", border: "none", borderRadius: "8px", padding: "8px 18px", fontSize: "13px", fontWeight: "bold", cursor: "pointer" },
+    tag: (color) => ({ background: `${color}18`, color, fontSize: "11px", padding: "2px 8px", borderRadius: "4px", fontWeight: "600" }),
+    aiBox: { background: "rgba(212,175,55,0.04)", border: "1px solid rgba(212,175,55,0.15)", borderRadius: "10px", padding: "1.25rem", fontSize: "13px", color: "#cbd5e1", lineHeight: "1.85", whiteSpace: "pre-wrap" },
+    input: { background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px", padding: "10px 14px", color: "#fff", fontSize: "13px", outline: "none", width: "100%", boxSizing: "border-box", fontFamily: "inherit" },
+    title: { fontSize: "17px", fontWeight: "bold", color: "#fff", marginBottom: "4px" },
+    sub: { fontSize: "12px", color: "#475569", marginBottom: "1.25rem" },
   };
 
-  const callClaude = async (prompt, mode) => {
-    setAiLoading(true);
-    setAiResponse("");
-    setAiMode(mode);
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          messages: [{ role: "user", content: prompt }],
-        }),
-      });
-      const data = await res.json();
-      setAiResponse(data.content?.[0]?.text || "No response received.");
-    } catch (e) {
-      setAiResponse("Error connecting to AI. Please try again.");
-    }
-    setAiLoading(false);
-  };
-
-  const handleDraftResponse = (c) => {
-    callClaude(
-      `You are a senior banking customer service manager. Draft a professional, empathetic response to this customer complaint for agent review.
-
-Customer: ${c.customer}
-Complaint Type: ${c.type}
-Product: ${c.product}
-Severity: ${c.severity}
-Customer Sentiment: ${c.sentiment}
-Issue Summary: ${c.summary}
-
-Write a warm, professional response (3-4 sentences) that:
-1. Acknowledges their frustration
-2. Confirms the issue is being investigated
-3. Gives a realistic timeline
-4. Provides a reference number
-
-Keep it concise and human.`,
-      "Draft Response"
-    );
-  };
-
-  const handleRootCause = () => {
-    callClaude(
-      `You are a banking operations analyst. Analyze these customer complaints and identify root causes and patterns:
-
-${COMPLAINTS.map(c => `- ${c.type} (${c.product}): ${c.summary}`).join("\n")}
-
-Provide:
-1. Top 3 root causes with brief explanation
-2. Which departments are most impacted
-3. One immediate action recommendation
-
-Be concise and actionable. Use bullet points.`,
-      "Root Cause Analysis"
-    );
-  };
-
-  const handleTrendInsight = () => {
-    callClaude(
-      `You are a banking analytics expert. Based on this complaint trend data for a bank:
-- October: 142 complaints, 128 resolved
-- November: 168 complaints, 145 resolved  
-- December: 195 complaints, 172 resolved
-- January: 178 complaints, 160 resolved
-- February: 210 complaints, 188 resolved
-- March: 156 so far, 124 resolved
-
-Top complaint types: Transaction Disputes (34), Card Issues (28), Loan Queries (22)
-
-Give a 3-point trend analysis with predictions for next month and one strategic recommendation. Be brief and sharp.`,
-      "Trend Insight"
-    );
-  };
+  const navBtn = (t, label) => (
+    <button key={t} onClick={() => { setTab(t); setSelected(null); setAiText(""); }} style={{ padding: "6px 14px", borderRadius: "6px", border: "none", cursor: "pointer", background: tab === t ? "linear-gradient(135deg,#D4AF37,#F59E0B)" : "rgba(255,255,255,0.05)", color: tab === t ? "#060d1f" : "#94a3b8", fontSize: "12px", fontWeight: tab === t ? "bold" : "normal" }}>{label}</button>
+  );
 
   return (
-    <div style={{
-      fontFamily: "'Georgia', 'Times New Roman', serif",
-      background: "linear-gradient(135deg, #0a0f1e 0%, #0d1535 50%, #0a1628 100%)",
-      minHeight: "100vh",
-      color: "#e2e8f0",
-    }}>
-      {/* Top Nav */}
-      <nav style={{
-        background: "rgba(10,15,30,0.95)",
-        borderBottom: "1px solid rgba(212,175,55,0.3)",
-        padding: "0 2rem",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        height: "64px",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        backdropFilter: "blur(20px)",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: "8px",
-            background: "linear-gradient(135deg, #D4AF37, #F59E0B)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: "18px", fontWeight: "bold", color: "#0a0f1e"
-          }}>⚡</div>
+    <div style={S.app}>
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}} *{box-sizing:border-box}`}</style>
+      <nav style={S.nav}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ width: 38, height: 38, borderRadius: "10px", background: "linear-gradient(135deg,#D4AF37,#F59E0B)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px", fontWeight: "bold", color: "#060d1f" }}>⚡</div>
           <div>
-            <div style={{ fontSize: "15px", fontWeight: "bold", color: "#D4AF37", letterSpacing: "0.5px" }}>ComplaintIQ</div>
-            <div style={{ fontSize: "10px", color: "#64748b", letterSpacing: "2px", textTransform: "uppercase" }}>Unified Intelligence Dashboard</div>
+            <div style={{ fontSize: "15px", fontWeight: "bold", color: "#D4AF37", letterSpacing: "1px" }}>ASPIRER · ComplaintIQ</div>
+            <div style={{ fontSize: "9px", color: "#475569", letterSpacing: "2px", textTransform: "uppercase" }}>Union Bank of India · PS5 · iDEA 2.0</div>
           </div>
         </div>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          {["dashboard", "complaints", "analytics"].map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{
-              padding: "6px 16px", borderRadius: "6px", border: "none", cursor: "pointer",
-              background: tab === t ? "linear-gradient(135deg, #D4AF37, #F59E0B)" : "rgba(255,255,255,0.05)",
-              color: tab === t ? "#0a0f1e" : "#94a3b8",
-              fontSize: "13px", fontWeight: tab === t ? "bold" : "normal",
-              textTransform: "capitalize", transition: "all 0.2s",
-            }}>{t}</button>
-          ))}
+        <div style={{ display: "flex", gap: "4px" }}>
+          {navBtn("dashboard", "📊 Dashboard")}
+          {navBtn("complaints", "📋 Complaints")}
+          {navBtn("ai", "🤖 AI Engine")}
+          {navBtn("analytics", "📈 Analytics")}
+          {navBtn("regulatory", "🏛️ Regulatory")}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 8px #10B981" }}></div>
-          <span style={{ fontSize: "12px", color: "#64748b" }}>Live · {new Date().toLocaleTimeString()}</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "12px", color: "#475569" }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10B981", boxShadow: "0 0 8px #10B981", animation: "pulse 2s infinite" }}></div>
+          <span>Live · {new Date().toLocaleTimeString("en-IN")}</span>
         </div>
       </nav>
 
-      <div style={{ padding: "2rem", maxWidth: "1400px", margin: "0 auto" }}>
+      <div style={{ padding: "2rem", maxWidth: "1440px", margin: "0 auto" }}>
 
-        {/* DASHBOARD TAB */}
-        {tab === "dashboard" && (
-          <>
-            {/* Header */}
-            <div style={{ marginBottom: "2rem" }}>
-              <h1 style={{ fontSize: "28px", fontWeight: "bold", color: "#fff", margin: 0 }}>
-                Good morning, <span style={{ color: "#D4AF37" }}>Operations Team</span> 👋
-              </h1>
-              <p style={{ color: "#64748b", marginTop: "4px", fontSize: "14px" }}>
-                {new Date().toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} · {stats.overdue} complaints need immediate attention
-              </p>
-            </div>
-
-            {/* Stats Row */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
-              {[
-                { label: "Total Complaints", value: stats.total, icon: "📋", color: "#3B82F6", sub: "This month" },
-                { label: "Open", value: stats.open, icon: "🔴", color: "#F59E0B", sub: "Awaiting action" },
-                { label: "Escalated", value: stats.escalated, icon: "⚠️", color: "#EF4444", sub: "Needs urgency" },
-                { label: "Resolved", value: stats.resolved, icon: "✅", color: "#10B981", sub: "This month" },
-                { label: "SLA Breached", value: stats.overdue, icon: "⏰", color: "#EC4899", sub: "Act now" },
-              ].map((s, i) => (
-                <div key={i} style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: `1px solid rgba(255,255,255,0.08)`,
-                  borderTop: `3px solid ${s.color}`,
-                  borderRadius: "12px", padding: "1.25rem",
-                  transition: "transform 0.2s",
-                  cursor: "default",
-                }}>
-                  <div style={{ fontSize: "24px", marginBottom: "8px" }}>{s.icon}</div>
-                  <div style={{
-                    fontSize: "32px", fontWeight: "bold", color: s.color,
-                    transform: animateStats ? "scale(1)" : "scale(0.5)",
-                    transition: `all 0.5s ease ${i * 0.1}s`,
-                  }}>{s.value}</div>
-                  <div style={{ fontSize: "13px", color: "#fff", fontWeight: "600", marginTop: "4px" }}>{s.label}</div>
-                  <div style={{ fontSize: "11px", color: "#475569", marginTop: "2px" }}>{s.sub}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* AI Insight Cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem", marginBottom: "2rem" }}>
-              {[
-                { label: "🤖 Root Cause Analysis", desc: "AI identifies patterns across all complaints", action: handleRootCause, mode: "Root Cause Analysis" },
-                { label: "📈 Trend Insights", desc: "AI predicts next month's complaint volume", action: handleTrendInsight, mode: "Trend Insight" },
-                { label: "⚡ Bulk Draft Responses", desc: "Auto-generate responses for open complaints", action: () => callClaude(`List 3 best practices for resolving banking complaints quickly. Be concise with bullet points.`, "Best Practices"), mode: "Best Practices" },
-              ].map((card, i) => (
-                <div key={i} style={{
-                  background: "linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.03))",
-                  border: "1px solid rgba(212,175,55,0.2)",
-                  borderRadius: "12px", padding: "1.25rem",
-                }}>
-                  <div style={{ fontSize: "15px", fontWeight: "bold", color: "#D4AF37", marginBottom: "6px" }}>{card.label}</div>
-                  <div style={{ fontSize: "12px", color: "#64748b", marginBottom: "12px" }}>{card.desc}</div>
-                  <button onClick={card.action} style={{
-                    background: "linear-gradient(135deg, #D4AF37, #F59E0B)",
-                    color: "#0a0f1e", border: "none", borderRadius: "6px",
-                    padding: "6px 14px", fontSize: "12px", fontWeight: "bold",
-                    cursor: "pointer",
-                  }}>Run AI Analysis →</button>
-                </div>
-              ))}
-            </div>
-
-            {/* Trend Chart */}
-            <div style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "12px", padding: "1.5rem", marginBottom: "2rem"
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-                <div>
-                  <div style={{ fontSize: "16px", fontWeight: "bold", color: "#fff" }}>Complaint Volume Trend</div>
-                  <div style={{ fontSize: "12px", color: "#64748b" }}>Monthly complaints vs resolved — last 6 months</div>
-                </div>
-                <div style={{ display: "flex", gap: "16px", fontSize: "12px" }}>
-                  <span><span style={{ color: "#F59E0B" }}>■</span> Received</span>
-                  <span><span style={{ color: "#10B981" }}>■</span> Resolved</span>
-                </div>
+        {/* DASHBOARD */}
+        {tab === "dashboard" && (<>
+          <div style={{ marginBottom: "2rem" }}>
+            <h1 style={{ fontSize: "26px", fontWeight: "bold", color: "#fff", margin: 0 }}>Good morning, <span style={{ color: "#D4AF37" }}>Team Aspirer</span> 👋</h1>
+            <p style={{ color: "#475569", marginTop: "4px", fontSize: "13px" }}>{new Date().toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} · {stats.overdue} SLA breaches need immediate attention</p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: "1rem", marginBottom: "2rem" }}>
+            {[{ label: "Total", value: stats.total, icon: "📋", color: "#3B82F6", sub: "This month" }, { label: "Open", value: stats.open, icon: "🔴", color: "#F59E0B", sub: "Awaiting action" }, { label: "Escalated", value: stats.escalated, icon: "⚠️", color: "#EF4444", sub: "Urgent" }, { label: "Resolved", value: stats.resolved, icon: "✅", color: "#10B981", sub: "Closed" }, { label: "SLA Breached", value: stats.overdue, icon: "⏰", color: "#EC4899", sub: "Act now" }].map((s, i) => (
+              <div key={i} style={{ ...S.card, borderTop: `3px solid ${s.color}` }}>
+                <div style={{ fontSize: "22px", marginBottom: "6px" }}>{s.icon}</div>
+                <div style={{ fontSize: "30px", fontWeight: "bold", color: s.color, opacity: animate ? 1 : 0, transition: `opacity 0.6s ease ${i * 0.1}s` }}>{s.value}</div>
+                <div style={{ fontSize: "13px", color: "#fff", fontWeight: "600", marginTop: "4px" }}>{s.label}</div>
+                <div style={{ fontSize: "11px", color: "#475569" }}>{s.sub}</div>
               </div>
-              <div style={{ display: "flex", alignItems: "flex-end", gap: "1.5rem", height: "120px" }}>
-                {TRENDS.map((t, i) => (
-                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-                    <div style={{ display: "flex", gap: "4px", alignItems: "flex-end", height: "90px" }}>
-                      <div style={{
-                        width: "18px", borderRadius: "4px 4px 0 0",
-                        background: "linear-gradient(to top, #F59E0B, #FCD34D)",
-                        height: `${(t.complaints / 210) * 90}px`,
-                        transition: "height 1s ease",
-                      }}></div>
-                      <div style={{
-                        width: "18px", borderRadius: "4px 4px 0 0",
-                        background: "linear-gradient(to top, #10B981, #34D399)",
-                        height: `${(t.resolved / 210) * 90}px`,
-                        transition: "height 1s ease",
-                      }}></div>
-                    </div>
-                    <div style={{ fontSize: "11px", color: "#64748b" }}>{t.month}</div>
-                  </div>
-                ))}
+            ))}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem", marginBottom: "2rem" }}>
+            {[{ icon: "🔍", label: "Root Cause Analysis", desc: "AI identifies patterns & root causes", action: handleRootCause }, { icon: "📈", label: "Trend Prediction", desc: "Predict next month volume & risks", action: handleTrend }, { icon: "🔗", label: "Duplicate Detection", desc: "Find related/duplicate complaints", action: () => { setTab("ai"); handleDuplicates(); } }].map((c, i) => (
+              <div key={i} style={S.goldCard}>
+                <div style={{ fontSize: "24px", marginBottom: "8px" }}>{c.icon}</div>
+                <div style={{ fontSize: "14px", fontWeight: "bold", color: "#D4AF37", marginBottom: "6px" }}>{c.label}</div>
+                <div style={{ fontSize: "12px", color: "#475569", marginBottom: "14px" }}>{c.desc}</div>
+                <button onClick={c.action} style={S.btn}>Run Analysis →</button>
               </div>
-            </div>
-
-            {/* Type Breakdown */}
-            <div style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: "12px", padding: "1.5rem"
-            }}>
-              <div style={{ fontSize: "16px", fontWeight: "bold", color: "#fff", marginBottom: "1rem" }}>Complaint Type Breakdown</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                {TYPE_DATA.map((t, i) => (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <div style={{ width: "130px", fontSize: "12px", color: "#94a3b8" }}>{t.type}</div>
-                    <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: "4px", height: "8px", overflow: "hidden" }}>
-                      <div style={{
-                        width: `${(t.count / 34) * 100}%`, height: "100%",
-                        background: t.color, borderRadius: "4px",
-                        transition: "width 1s ease",
-                      }}></div>
-                    </div>
-                    <div style={{ width: "30px", fontSize: "12px", color: t.color, fontWeight: "bold" }}>{t.count}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* COMPLAINTS TAB */}
-        {tab === "complaints" && (
-          <>
+            ))}
+          </div>
+          <div style={{ ...S.card, marginBottom: "2rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-              <div>
-                <h2 style={{ margin: 0, color: "#fff", fontSize: "22px" }}>All Complaints</h2>
-                <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: "13px" }}>{filtered.length} complaints shown</p>
-              </div>
-              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                <input
-                  placeholder="Search by name, ID, type..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  style={{
-                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "8px", padding: "8px 14px", color: "#fff", fontSize: "13px", width: "220px",
-                    outline: "none",
-                  }}
-                />
-                {["All", "Open", "In Progress", "Escalated", "Resolved"].map(f => (
-                  <button key={f} onClick={() => setFilter(f)} style={{
-                    padding: "6px 12px", borderRadius: "6px", border: "none", cursor: "pointer",
-                    background: filter === f ? "linear-gradient(135deg, #D4AF37, #F59E0B)" : "rgba(255,255,255,0.06)",
-                    color: filter === f ? "#0a0f1e" : "#94a3b8",
-                    fontSize: "12px", fontWeight: filter === f ? "bold" : "normal",
-                  }}>{f}</button>
-                ))}
-              </div>
+              <div><div style={S.title}>Complaint Volume — 6 Month Trend</div><div style={S.sub}>Monthly received vs resolved</div></div>
+              <div style={{ display: "flex", gap: "16px", fontSize: "12px", color: "#64748b" }}><span><span style={{ color: "#F59E0B" }}>■</span> Received</span><span><span style={{ color: "#10B981" }}>■</span> Resolved</span></div>
             </div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: "2rem", height: "130px", padding: "0 1rem" }}>
+              {TRENDS.map((t, i) => (
+                <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
+                  <div style={{ display: "flex", gap: "4px", alignItems: "flex-end", height: "100px" }}>
+                    <div style={{ width: "20px", borderRadius: "4px 4px 0 0", background: "linear-gradient(to top,#F59E0B,#FCD34D)", height: `${(t.complaints / 210) * 100}px` }}></div>
+                    <div style={{ width: "20px", borderRadius: "4px 4px 0 0", background: "linear-gradient(to top,#10B981,#34D399)", height: `${(t.resolved / 210) * 100}px` }}></div>
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#475569" }}>{t.month}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {(aiLoading || aiText) && (
+            <div style={S.goldCard}>
+              <div style={{ fontSize: "12px", color: "#D4AF37", fontWeight: "bold", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "1px" }}>🤖 {aiLabel} {aiLoading ? "— Analyzing..." : "— Complete"}</div>
+              {aiLoading ? <div style={{ color: "#D4AF37" }}>✨ AI is processing data...</div> : <div style={S.aiBox}>{aiText}</div>}
+            </div>
+          )}
+        </>)}
 
-            <div style={{ display: "grid", gridTemplateColumns: selected ? "1fr 420px" : "1fr", gap: "1.5rem" }}>
-              {/* List */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                {filtered.map(c => (
-                  <div key={c.id} onClick={() => { setSelected(c); setAiResponse(""); }} style={{
-                    background: selected?.id === c.id ? "rgba(212,175,55,0.08)" : "rgba(255,255,255,0.03)",
-                    border: selected?.id === c.id ? "1px solid rgba(212,175,55,0.4)" : "1px solid rgba(255,255,255,0.07)",
-                    borderLeft: `4px solid ${severityColor[c.severity]}`,
-                    borderRadius: "10px", padding: "1rem 1.25rem",
-                    cursor: "pointer", transition: "all 0.2s",
-                  }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
-                          <span style={{ fontSize: "12px", color: "#D4AF37", fontWeight: "bold" }}>{c.id}</span>
-                          <span style={{ fontSize: "12px", color: "#fff", fontWeight: "600" }}>{c.customer}</span>
-                          <span style={{ fontSize: "18px" }}>{sentimentEmoji[c.sentiment]}</span>
-                          {c.escalated && <span style={{ background: "#EF444420", color: "#EF4444", fontSize: "10px", padding: "2px 6px", borderRadius: "4px", fontWeight: "bold" }}>ESCALATED</span>}
-                        </div>
-                        <div style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "8px" }}>{c.summary}</div>
-                        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                          {[
-                            { label: c.type, color: "#3B82F6" },
-                            { label: c.product, color: "#8B5CF6" },
-                            { label: c.channel, color: "#6B7280" },
-                          ].map((tag, i) => (
-                            <span key={i} style={{
-                              background: `${tag.color}20`, color: tag.color,
-                              fontSize: "11px", padding: "2px 8px", borderRadius: "4px",
-                            }}>{tag.label}</span>
-                          ))}
-                        </div>
+        {/* COMPLAINTS */}
+        {tab === "complaints" && (<>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+            <div><h2 style={{ margin: 0, color: "#fff", fontSize: "22px" }}>All Complaints</h2><p style={{ margin: "4px 0 0", color: "#475569", fontSize: "13px" }}>{filtered.length} of {COMPLAINTS.length} shown</p></div>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+              <input placeholder="🔍 Search name, ID, type..." value={search} onChange={e => setSearch(e.target.value)} style={{ ...S.input, width: "220px" }} />
+              {["All", "Open", "In Progress", "Escalated", "Resolved"].map(f => (
+                <button key={f} onClick={() => setFilter(f)} style={{ padding: "6px 12px", borderRadius: "6px", border: "none", cursor: "pointer", background: filter === f ? "linear-gradient(135deg,#D4AF37,#F59E0B)" : "rgba(255,255,255,0.05)", color: filter === f ? "#060d1f" : "#94a3b8", fontSize: "12px", fontWeight: filter === f ? "bold" : "normal" }}>{f}</button>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: selected ? "1fr 440px" : "1fr", gap: "1.5rem" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {filtered.map(c => (
+                <div key={c.id} onClick={() => { setSelected(c); setAiText(""); setAiLabel(""); }} style={{ background: selected?.id === c.id ? "rgba(212,175,55,0.07)" : "rgba(255,255,255,0.03)", border: selected?.id === c.id ? "1px solid rgba(212,175,55,0.35)" : "1px solid rgba(255,255,255,0.06)", borderLeft: `4px solid ${severityColor[c.severity]}`, borderRadius: "10px", padding: "1rem 1.25rem", cursor: "pointer", transition: "all 0.15s" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px", flexWrap: "wrap" }}>
+                        <span style={{ fontSize: "12px", color: "#D4AF37", fontWeight: "bold" }}>{c.id}</span>
+                        <span style={{ fontSize: "13px", color: "#fff", fontWeight: "600" }}>{c.customer}</span>
+                        <span>{sentimentEmoji[c.sentiment]}</span>
+                        {c.escalated && <span style={S.tag("#EF4444")}>ESCALATED</span>}
+                        {c.slaBreached && <span style={S.tag("#EC4899")}>SLA BREACH</span>}
                       </div>
-                      <div style={{ textAlign: "right", marginLeft: "1rem", minWidth: "100px" }}>
-                        <div style={{
-                          background: `${statusColor[c.status]}20`, color: statusColor[c.status],
-                          fontSize: "11px", padding: "3px 8px", borderRadius: "4px",
-                          fontWeight: "bold", marginBottom: "6px", display: "inline-block"
-                        }}>{c.status}</div>
-                        <div style={{ fontSize: "11px", color: c.slaDue === "Overdue" ? "#EF4444" : "#F59E0B" }}>⏱ {c.slaDue}</div>
-                        <div style={{ fontSize: "11px", color: "#475569", marginTop: "4px" }}>👤 {c.assigned}</div>
+                      <div style={{ fontSize: "13px", color: "#94a3b8", marginBottom: "8px" }}>{c.summary}</div>
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                        <span style={S.tag("#3B82F6")}>{c.type}</span>
+                        <span style={S.tag("#8B5CF6")}>{c.product}</span>
+                        <span style={S.tag("#6B7280")}>{c.channel}</span>
                       </div>
                     </div>
+                    <div style={{ textAlign: "right", marginLeft: "1rem", minWidth: "110px" }}>
+                      <div style={{ ...S.tag(statusColor[c.status]), display: "inline-block", marginBottom: "6px", padding: "3px 10px" }}>{c.status}</div>
+                      <div style={{ fontSize: "11px", color: c.slaBreached ? "#EF4444" : "#F59E0B", marginBottom: "4px" }}>⏱ {c.slaDue}</div>
+                      <div style={{ fontSize: "11px", color: "#475569" }}>👤 {c.assigned}</div>
+                    </div>
                   </div>
-                ))}
+                </div>
+              ))}
+            </div>
+            {selected && (
+              <div style={{ ...S.goldCard, position: "sticky", top: "80px", height: "fit-content", maxHeight: "85vh", overflowY: "auto" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.25rem" }}>
+                  <div>
+                    <div style={{ fontSize: "20px", fontWeight: "bold", color: "#D4AF37" }}>{selected.id}</div>
+                    <div style={{ fontSize: "15px", color: "#fff", fontWeight: "600" }}>{selected.customer}</div>
+                    <div style={{ fontSize: "12px", color: "#475569" }}>{selected.phone} · {selected.accountNo}</div>
+                  </div>
+                  <button onClick={() => { setSelected(null); setAiText(""); }} style={{ background: "rgba(255,255,255,0.07)", border: "none", color: "#94a3b8", borderRadius: "6px", padding: "4px 10px", cursor: "pointer" }}>✕</button>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "1rem" }}>
+                  {[["Type", selected.type], ["Product", selected.product], ["Severity", selected.severity], ["Sentiment", `${sentimentEmoji[selected.sentiment]} ${selected.sentiment}`], ["Channel", selected.channel], ["Assigned", selected.assigned], ["Created", selected.created], ["SLA", selected.slaDue]].map(([k, v], i) => (
+                    <div key={i} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "8px 10px" }}>
+                      <div style={{ fontSize: "10px", color: "#475569", textTransform: "uppercase", letterSpacing: "1px" }}>{k}</div>
+                      <div style={{ fontSize: "13px", color: "#e2e8f0", marginTop: "2px", fontWeight: "500" }}>{v}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "12px", marginBottom: "1rem" }}>
+                  <div style={{ fontSize: "10px", color: "#475569", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>Issue Summary</div>
+                  <div style={{ fontSize: "13px", color: "#cbd5e1", lineHeight: "1.6" }}>{selected.summary}</div>
+                </div>
+                <div style={{ marginBottom: "1rem" }}>
+                  <div style={{ fontSize: "12px", color: "#D4AF37", fontWeight: "bold", marginBottom: "8px" }}>📨 Communication History</div>
+                  {[{ from: "Customer", msg: "I need this resolved urgently. This is unacceptable.", time: "10:24 AM" }, { from: selected.assigned, msg: "We have logged your complaint and our team is investigating.", time: "11:05 AM" }, { from: "System", msg: selected.slaBreached ? "⚠️ SLA breached. Auto-escalated to senior manager." : "Complaint assigned and SLA timer started.", time: "11:06 AM" }].map((h, i) => (
+                    <div key={i} style={{ background: h.from === "Customer" ? "rgba(59,130,246,0.08)" : h.from === "System" ? "rgba(239,68,68,0.08)" : "rgba(16,185,129,0.08)", borderLeft: `3px solid ${h.from === "Customer" ? "#3B82F6" : h.from === "System" ? "#EF4444" : "#10B981"}`, borderRadius: "6px", padding: "8px 10px", marginBottom: "6px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: "11px", fontWeight: "bold", color: "#94a3b8" }}>{h.from}</span><span style={{ fontSize: "10px", color: "#334155" }}>{h.time}</span></div>
+                      <div style={{ fontSize: "12px", color: "#cbd5e1", marginTop: "3px" }}>{h.msg}</div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => handleDraft(selected)} disabled={aiLoading} style={{ ...S.btn, width: "100%", marginBottom: "8px", opacity: aiLoading ? 0.7 : 1 }}>
+                  {aiLoading && aiLabel === "AI Draft Response" ? "✨ Drafting..." : "🤖 Generate AI Draft Response"}
+                </button>
+                {aiText && aiLabel === "AI Draft Response" && (
+                  <div style={S.aiBox}><div style={{ fontSize: "11px", color: "#D4AF37", fontWeight: "bold", marginBottom: "8px" }}>✅ DRAFT READY — Review before sending</div>{aiText}</div>
+                )}
               </div>
+            )}
+          </div>
+        </>)}
 
-              {/* Detail Panel */}
-              {selected && (
-                <div style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(212,175,55,0.2)",
-                  borderRadius: "12px", padding: "1.5rem",
-                  height: "fit-content", position: "sticky", top: "80px",
-                }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem" }}>
-                    <div>
-                      <div style={{ fontSize: "18px", fontWeight: "bold", color: "#D4AF37" }}>{selected.id}</div>
-                      <div style={{ fontSize: "14px", color: "#fff", marginTop: "2px" }}>{selected.customer}</div>
+        {/* AI ENGINE */}
+        {tab === "ai" && (<>
+          <div style={{ marginBottom: "2rem" }}><h2 style={{ margin: 0, color: "#fff", fontSize: "22px" }}>🤖 AI Engine</h2><p style={{ margin: "4px 0 0", color: "#475569", fontSize: "13px" }}>Live Gen-AI powered complaint intelligence</p></div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div style={{ ...S.card, gridColumn: "1 / -1" }}>
+              <div style={S.title}>⚡ Live Complaint Categorizer</div>
+              <div style={S.sub}>Type any customer complaint — AI instantly categorizes it with severity, sentiment & next action</div>
+              <textarea value={liveComplaint} onChange={e => setLiveComplaint(e.target.value)} placeholder="e.g. My salary account shows wrong balance since yesterday and I cannot withdraw money from ATM..." style={{ ...S.input, height: "80px", resize: "vertical", marginBottom: "12px" }} />
+              <button onClick={handleLiveCategory} disabled={liveLoading || !liveComplaint.trim()} style={{ ...S.btn, opacity: liveLoading || !liveComplaint.trim() ? 0.7 : 1 }}>
+                {liveLoading ? "✨ Analyzing..." : "🔍 Categorize with AI →"}
+              </button>
+              {liveResult && !liveResult.error && (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "10px", marginTop: "1.25rem" }}>
+                  {[["Type", liveResult.type, "#3B82F6"], ["Product", liveResult.product, "#8B5CF6"], ["Severity", liveResult.severity, severityColor[liveResult.severity] || "#F59E0B"], ["Sentiment", liveResult.sentiment, "#EC4899"], ["Priority", liveResult.priority, "#F59E0B"], ["Summary", liveResult.summary, "#10B981"], ["Next Action", liveResult.suggested_action, "#D4AF37"]].map(([k, v, col], i) => (
+                    <div key={i} style={{ background: `${col}12`, border: `1px solid ${col}30`, borderRadius: "8px", padding: "10px", gridColumn: i >= 4 ? "span 2" : "span 1" }}>
+                      <div style={{ fontSize: "10px", color: "#475569", textTransform: "uppercase", letterSpacing: "1px" }}>{k}</div>
+                      <div style={{ fontSize: "13px", color: col, fontWeight: "bold", marginTop: "4px" }}>{v}</div>
                     </div>
-                    <button onClick={() => setSelected(null)} style={{
-                      background: "rgba(255,255,255,0.08)", border: "none", color: "#94a3b8",
-                      borderRadius: "6px", padding: "4px 10px", cursor: "pointer", fontSize: "16px"
-                    }}>✕</button>
-                  </div>
-
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "1rem" }}>
-                    {[
-                      ["Type", selected.type], ["Product", selected.product],
-                      ["Severity", selected.severity], ["Sentiment", `${sentimentEmoji[selected.sentiment]} ${selected.sentiment}`],
-                      ["Channel", selected.channel], ["Assigned", selected.assigned],
-                      ["Created", selected.created], ["SLA", selected.slaDue],
-                    ].map(([k, v], i) => (
-                      <div key={i} style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "8px" }}>
-                        <div style={{ fontSize: "10px", color: "#475569", textTransform: "uppercase", letterSpacing: "1px" }}>{k}</div>
-                        <div style={{ fontSize: "13px", color: "#e2e8f0", marginTop: "2px", fontWeight: "500" }}>{v}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "8px", padding: "12px", marginBottom: "1rem" }}>
-                    <div style={{ fontSize: "11px", color: "#475569", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>Issue Summary</div>
-                    <div style={{ fontSize: "13px", color: "#cbd5e1", lineHeight: "1.6" }}>{selected.summary}</div>
-                  </div>
-
-                  {/* Communication History */}
-                  <div style={{ marginBottom: "1rem" }}>
-                    <div style={{ fontSize: "12px", color: "#D4AF37", fontWeight: "bold", marginBottom: "8px" }}>📨 Communication History</div>
-                    {[
-                      { from: "Customer", msg: "I need this resolved urgently.", time: "10:24 AM" },
-                      { from: selected.assigned, msg: "We have logged your complaint and are investigating.", time: "11:05 AM" },
-                      { from: "System", msg: "Complaint escalated due to SLA breach.", time: "2:30 PM" },
-                    ].map((h, i) => (
-                      <div key={i} style={{
-                        background: h.from === "Customer" ? "rgba(59,130,246,0.08)" : h.from === "System" ? "rgba(239,68,68,0.08)" : "rgba(16,185,129,0.08)",
-                        borderRadius: "8px", padding: "8px 10px", marginBottom: "6px",
-                        borderLeft: `3px solid ${h.from === "Customer" ? "#3B82F6" : h.from === "System" ? "#EF4444" : "#10B981"}`,
-                      }}>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: "11px", fontWeight: "bold", color: "#94a3b8" }}>{h.from}</span>
-                          <span style={{ fontSize: "10px", color: "#475569" }}>{h.time}</span>
-                        </div>
-                        <div style={{ fontSize: "12px", color: "#cbd5e1", marginTop: "3px" }}>{h.msg}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button onClick={() => handleDraftResponse(selected)} style={{
-                    width: "100%", background: "linear-gradient(135deg, #D4AF37, #F59E0B)",
-                    color: "#0a0f1e", border: "none", borderRadius: "8px",
-                    padding: "10px", fontSize: "13px", fontWeight: "bold",
-                    cursor: "pointer", marginBottom: "8px",
-                  }}>🤖 Generate AI Draft Response</button>
-
-                  {aiLoading && aiMode === "Draft Response" && (
-                    <div style={{ textAlign: "center", padding: "16px", color: "#D4AF37", fontSize: "13px" }}>
-                      ✨ AI is drafting response...
-                    </div>
-                  )}
-
-                  {aiResponse && aiMode === "Draft Response" && (
-                    <div style={{
-                      background: "rgba(212,175,55,0.06)", border: "1px solid rgba(212,175,55,0.2)",
-                      borderRadius: "8px", padding: "12px", fontSize: "13px", color: "#e2e8f0", lineHeight: "1.6"
-                    }}>
-                      <div style={{ fontSize: "11px", color: "#D4AF37", fontWeight: "bold", marginBottom: "8px" }}>✅ AI DRAFT — Ready for Agent Review</div>
-                      {aiResponse}
-                    </div>
-                  )}
+                  ))}
                 </div>
               )}
+              {liveResult?.error && <div style={{ ...S.aiBox, marginTop: "12px" }}>{liveResult.error}</div>}
             </div>
-          </>
-        )}
-
-        {/* ANALYTICS TAB */}
-        {tab === "analytics" && (
-          <>
-            <h2 style={{ color: "#fff", fontSize: "22px", marginBottom: "1.5rem" }}>AI-Powered Analytics</h2>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem" }}>
-              {/* Severity Distribution */}
-              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "1.5rem" }}>
-                <div style={{ fontSize: "15px", fontWeight: "bold", color: "#fff", marginBottom: "1rem" }}>Severity Distribution</div>
-                {Object.entries(severityColor).map(([sev, col]) => {
-                  const count = COMPLAINTS.filter(c => c.severity === sev).length;
-                  return (
-                    <div key={sev} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-                      <div style={{ width: "70px", fontSize: "12px", color: "#94a3b8" }}>{sev}</div>
-                      <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: "4px", height: "10px" }}>
-                        <div style={{ width: `${(count / COMPLAINTS.length) * 100}%`, height: "100%", background: col, borderRadius: "4px" }}></div>
-                      </div>
-                      <div style={{ width: "20px", fontSize: "13px", color: col, fontWeight: "bold" }}>{count}</div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Channel Distribution */}
-              <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "1.5rem" }}>
-                <div style={{ fontSize: "15px", fontWeight: "bold", color: "#fff", marginBottom: "1rem" }}>Channel Distribution</div>
-                {["Email", "Phone", "Chat", "Branch", "App"].map((ch, i) => {
-                  const count = COMPLAINTS.filter(c => c.channel === ch).length;
-                  const colors = ["#3B82F6", "#F59E0B", "#10B981", "#8B5CF6", "#EC4899"];
-                  return (
-                    <div key={ch} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
-                      <div style={{ width: "60px", fontSize: "12px", color: "#94a3b8" }}>{ch}</div>
-                      <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: "4px", height: "10px" }}>
-                        <div style={{ width: `${(count / COMPLAINTS.length) * 100}%`, height: "100%", background: colors[i], borderRadius: "4px" }}></div>
-                      </div>
-                      <div style={{ width: "20px", fontSize: "13px", color: colors[i], fontWeight: "bold" }}>{count}</div>
-                    </div>
-                  );
-                })}
-              </div>
+            <div style={S.card}>
+              <div style={S.title}>🔗 Duplicate Detection</div>
+              <div style={S.sub}>AI scans all complaints to find duplicates or related issues</div>
+              <button onClick={handleDuplicates} disabled={dupLoading} style={{ ...S.btn, marginBottom: "1rem", opacity: dupLoading ? 0.7 : 1 }}>{dupLoading ? "✨ Scanning..." : "🔍 Find Duplicates →"}</button>
+              {dupResult ? <div style={S.aiBox}>{dupResult}</div> : <div style={{ textAlign: "center", padding: "2rem", color: "#334155" }}><div style={{ fontSize: "28px" }}>🔍</div><div style={{ fontSize: "13px", marginTop: "8px" }}>Click to scan for duplicates</div></div>}
             </div>
-
-            {/* AI Analysis Panel */}
-            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "1.5rem" }}>
-              <div style={{ fontSize: "15px", fontWeight: "bold", color: "#fff", marginBottom: "1rem" }}>🤖 Gen-AI Intelligence Center</div>
-              <div style={{ display: "flex", gap: "10px", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-                {[
-                  { label: "🔍 Root Cause Analysis", action: handleRootCause, mode: "Root Cause Analysis" },
-                  { label: "📈 Trend Prediction", action: handleTrendInsight, mode: "Trend Insight" },
-                  { label: "⚡ Best Practices", action: () => callClaude("List 5 best practices for a banking complaint resolution team using AI. Be specific and concise.", "Best Practices"), mode: "Best Practices" },
-                  { label: "📊 Regulatory Summary", action: () => callClaude("Generate a brief regulatory compliance summary for a bank's complaint management system, mentioning RBI guidelines for complaint resolution. Be concise.", "Regulatory Summary"), mode: "Regulatory Summary" },
-                ].map((btn, i) => (
-                  <button key={i} onClick={btn.action} style={{
-                    background: aiMode === btn.mode && (aiLoading || aiResponse) ? "linear-gradient(135deg, #D4AF37, #F59E0B)" : "rgba(212,175,55,0.1)",
-                    border: "1px solid rgba(212,175,55,0.3)", color: aiMode === btn.mode && (aiLoading || aiResponse) ? "#0a0f1e" : "#D4AF37",
-                    borderRadius: "8px", padding: "8px 16px", fontSize: "13px",
-                    cursor: "pointer", fontWeight: "600",
-                  }}>{btn.label}</button>
-                ))}
-              </div>
-
-              {aiLoading && (
-                <div style={{ textAlign: "center", padding: "2rem", color: "#D4AF37" }}>
-                  <div style={{ fontSize: "24px", marginBottom: "8px" }}>✨</div>
-                  <div style={{ fontSize: "14px" }}>AI is analyzing complaint data...</div>
-                </div>
-              )}
-
-              {!aiLoading && aiResponse && (
-                <div style={{
-                  background: "rgba(212,175,55,0.05)", border: "1px solid rgba(212,175,55,0.15)",
-                  borderRadius: "10px", padding: "1.25rem",
-                }}>
-                  <div style={{ fontSize: "12px", color: "#D4AF37", fontWeight: "bold", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "1px" }}>
-                    ✅ {aiMode} — Generated by Gen-AI
-                  </div>
-                  <div style={{ fontSize: "14px", color: "#cbd5e1", lineHeight: "1.8", whiteSpace: "pre-wrap" }}>{aiResponse}</div>
-                </div>
-              )}
-
-              {!aiLoading && !aiResponse && (
-                <div style={{ textAlign: "center", padding: "2rem", color: "#475569" }}>
-                  <div style={{ fontSize: "32px", marginBottom: "8px" }}>🤖</div>
-                  <div style={{ fontSize: "14px" }}>Click any button above to run AI analysis on your complaint data</div>
-                </div>
-              )}
+            <div style={S.card}>
+              <div style={S.title}>🧠 Root Cause Analysis</div>
+              <div style={S.sub}>AI identifies patterns and systemic issues across all complaints</div>
+              <button onClick={handleRootCause} disabled={aiLoading} style={{ ...S.btn, marginBottom: "1rem", opacity: aiLoading ? 0.7 : 1 }}>{aiLoading && aiLabel === "Root Cause Analysis" ? "✨ Analyzing..." : "🔍 Run Analysis →"}</button>
+              {aiText && aiLabel === "Root Cause Analysis" ? <div style={S.aiBox}>{aiText}</div> : <div style={{ textAlign: "center", padding: "2rem", color: "#334155" }}><div style={{ fontSize: "28px" }}>🧠</div><div style={{ fontSize: "13px", marginTop: "8px" }}>Click to identify root causes</div></div>}
             </div>
-          </>
-        )}
+          </div>
+        </>)}
+
+        {/* ANALYTICS */}
+        {tab === "analytics" && (<>
+          <div style={{ marginBottom: "2rem" }}><h2 style={{ margin: 0, color: "#fff", fontSize: "22px" }}>📈 Analytics</h2><p style={{ margin: "4px 0 0", color: "#475569", fontSize: "13px" }}>Complaint trends, patterns and AI predictions</p></div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div style={S.card}>
+              <div style={{ ...S.title, marginBottom: "1rem" }}>Severity Distribution</div>
+              {Object.entries(severityColor).map(([sev, col]) => { const count = COMPLAINTS.filter(c => c.severity === sev).length; return (<div key={sev} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}><div style={{ width: "70px", fontSize: "12px", color: "#94a3b8" }}>{sev}</div><div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: "4px", height: "10px" }}><div style={{ width: `${(count / COMPLAINTS.length) * 100}%`, height: "100%", background: col, borderRadius: "4px" }}></div></div><div style={{ width: "24px", fontSize: "13px", color: col, fontWeight: "bold" }}>{count}</div></div>); })}
+            </div>
+            <div style={S.card}>
+              <div style={{ ...S.title, marginBottom: "1rem" }}>Channel Distribution</div>
+              {["Email", "Phone", "Chat", "Branch", "App"].map((ch, i) => { const count = COMPLAINTS.filter(c => c.channel === ch).length; const colors = ["#3B82F6", "#F59E0B", "#10B981", "#8B5CF6", "#EC4899"]; return (<div key={ch} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}><div style={{ width: "60px", fontSize: "12px", color: "#94a3b8" }}>{ch}</div><div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: "4px", height: "10px" }}><div style={{ width: `${(count / COMPLAINTS.length) * 100}%`, height: "100%", background: colors[i], borderRadius: "4px" }}></div></div><div style={{ width: "24px", fontSize: "13px", color: colors[i], fontWeight: "bold" }}>{count}</div></div>); })}
+            </div>
+            <div style={S.card}>
+              <div style={{ ...S.title, marginBottom: "1rem" }}>Complaint Type Breakdown</div>
+              {TYPE_DATA.map((t, i) => (<div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}><div style={{ width: "140px", fontSize: "12px", color: "#94a3b8" }}>{t.type}</div><div style={{ flex: 1, background: "rgba(255,255,255,0.06)", borderRadius: "4px", height: "8px" }}><div style={{ width: `${(t.count / 34) * 100}%`, height: "100%", background: t.color, borderRadius: "4px" }}></div></div><div style={{ width: "24px", fontSize: "12px", color: t.color, fontWeight: "bold" }}>{t.count}</div></div>))}
+            </div>
+            <div style={S.card}>
+              <div style={S.title}>AI Trend Prediction</div>
+              <div style={S.sub}>Predict next month's volume and risks</div>
+              <button onClick={handleTrend} disabled={aiLoading} style={{ ...S.btn, marginBottom: "1rem", opacity: aiLoading ? 0.7 : 1 }}>{aiLoading && aiLabel === "Trend Prediction" ? "✨ Predicting..." : "📈 Run Prediction →"}</button>
+              {aiText && aiLabel === "Trend Prediction" ? <div style={S.aiBox}>{aiText}</div> : <div style={{ textAlign: "center", padding: "2rem", color: "#334155" }}><div style={{ fontSize: "28px" }}>📈</div><div style={{ fontSize: "13px", marginTop: "8px" }}>Click to predict next month</div></div>}
+            </div>
+          </div>
+        </>)}
+
+        {/* REGULATORY */}
+        {tab === "regulatory" && (<>
+          <div style={{ marginBottom: "2rem" }}><h2 style={{ margin: 0, color: "#fff", fontSize: "22px" }}>🏛️ Regulatory Reporting</h2><p style={{ margin: "4px 0 0", color: "#475569", fontSize: "13px" }}>RBI-compliant complaint reports · Banking Ombudsman Scheme</p></div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "1rem", marginBottom: "2rem" }}>
+            {[{ label: "Total This Month", value: COMPLAINTS.length, color: "#3B82F6", rbi: "Per RBI CMS Guidelines" }, { label: "Resolution Rate", value: `${Math.round((stats.resolved / stats.total) * 100)}%`, color: "#10B981", rbi: "Target: >90%" }, { label: "SLA Compliance", value: `${Math.round(((stats.total - stats.overdue) / stats.total) * 100)}%`, color: "#F59E0B", rbi: "Target: >95%" }, { label: "Escalation Rate", value: `${Math.round((stats.escalated / stats.total) * 100)}%`, color: "#EF4444", rbi: "Should be <5%" }].map((s, i) => (
+              <div key={i} style={{ ...S.card, borderTop: `3px solid ${s.color}` }}>
+                <div style={{ fontSize: "28px", fontWeight: "bold", color: s.color }}>{s.value}</div>
+                <div style={{ fontSize: "13px", color: "#fff", fontWeight: "600", marginTop: "4px" }}>{s.label}</div>
+                <div style={{ fontSize: "10px", color: "#475569", marginTop: "4px" }}>{s.rbi}</div>
+              </div>
+            ))}
+          </div>
+          <div style={S.goldCard}>
+            <div style={S.title}>📄 AI-Generated RBI Regulatory Report</div>
+            <div style={S.sub}>Generate a formal complaint management report compliant with RBI Banking Ombudsman Scheme</div>
+            <button onClick={handleRegulatory} disabled={regLoading} style={{ ...S.btn, marginBottom: "1.5rem", opacity: regLoading ? 0.7 : 1 }}>{regLoading ? "✨ Generating..." : "🏛️ Generate RBI Report →"}</button>
+            {regResult ? (
+              <div style={S.aiBox}><div style={{ fontSize: "11px", color: "#D4AF37", fontWeight: "bold", marginBottom: "10px", textTransform: "uppercase", letterSpacing: "1px" }}>✅ OFFICIAL REPORT — {new Date().toLocaleDateString("en-IN")}</div>{regResult}</div>
+            ) : !regLoading && (
+              <div style={{ textAlign: "center", padding: "2rem", color: "#334155" }}><div style={{ fontSize: "32px" }}>🏛️</div><div style={{ fontSize: "13px", marginTop: "8px" }}>Click to generate RBI-compliant report</div></div>
+            )}
+          </div>
+        </>)}
+
       </div>
     </div>
   );
